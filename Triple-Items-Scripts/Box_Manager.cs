@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Box_Manager : MonoBehaviour
 {
-    public Carrot.Carrot carrot;
+    public Games game;
 
     [Header("Icons")]
     public Sprite sp_icon_all_style;
@@ -39,15 +39,15 @@ public class Box_Manager : MonoBehaviour
 
     public void change_style_box()
     {
-        this.carrot.show_loading();
-        Query iconQuery = this.carrot.db.Collection("icon_category");
+        this.game.carrot.show_loading();
+        Query iconQuery = this.game.carrot.db.Collection("icon_category");
         iconQuery.Limit(20);
         iconQuery.GetSnapshotAsync().ContinueWithOnMainThread(Task =>{
             QuerySnapshot IconQuerySnapshot = Task.Result;
             if (Task.IsCompleted)
             {
-                carrot.hide_loading();
-                Carrot.Carrot_Box box_list_style = this.carrot.Create_Box();
+                this.game.carrot.hide_loading();
+                Carrot.Carrot_Box box_list_style = this.game.carrot.Create_Box();
                 box_list_style.set_icon(this.sp_icon_all_style);
                 box_list_style.set_title("Bundle of object styles");
 
@@ -86,22 +86,25 @@ public class Box_Manager : MonoBehaviour
             }
 
             if (is_true)
+            {
                 Debug.Log("Is True");
+                for (int i = 0; i < this.list_items_tray.Count; i++)
+                {
+                    this.game.create_effect(this.list_items_tray[i].transform.position);
+                }
+                
+            }
             else
-                Debug.Log("Is False");
-
-            this.act_give_up_all_item();
-
+            {
+                for (int i = 0; i < this.list_items_tray.Count; i++)
+                {
+                    this.list_items_tray[i].give_up(this.area_body);
+                }
+                Debug.Log("Is false");
+            };
             this.list_items_tray = new List<box_items>();
             this.index_tray_check = 0;
         }
     }
 
-    private void act_give_up_all_item()
-    {
-        for (int i = 0; i < this.list_items_tray.Count; i++)
-        {
-            this.list_items_tray[i].give_up(this.area_body);
-        }
-    }
 }
