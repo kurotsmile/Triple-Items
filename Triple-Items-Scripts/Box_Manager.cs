@@ -11,6 +11,7 @@ public class Box_Manager : MonoBehaviour
 
     [Header("Icons")]
     public Sprite sp_icon_all_style;
+    public Sprite sp_icon_buy;
 
     [Header("Obj Main")]
     public Transform area_body;
@@ -77,6 +78,16 @@ public class Box_Manager : MonoBehaviour
                             Carrot.Carrot_Box_Btn_Item btn_data=item_cat.create_item();
                             btn_data.set_icon(this.game.carrot.icon_carrot_database);
                             btn_data.set_color(this.game.carrot.color_highlight);
+                        }
+                    }
+
+                    if (icon_data["buy"] != null)
+                    {
+                        if (icon_data["buy"].ToString() == "buy")
+                        {
+                            Carrot.Carrot_Box_Btn_Item btn_buy = item_cat.create_item();
+                            btn_buy.set_icon(this.sp_icon_buy);
+                            btn_buy.set_color(this.game.carrot.color_highlight);
                         }
                     }
                 };

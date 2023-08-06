@@ -1873,6 +1873,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   game: {fileID: 1708118598}
   sp_icon_all_style: {fileID: 21300000, guid: bc54183615f3759478665fb882ce6117, type: 3}
+  sp_icon_buy: {fileID: 21300000, guid: 14d9cfee3bc91d74091d7370486c78f9, type: 3}
   area_body: {fileID: 151106475}
   prefab_box_items: {fileID: 4953361289375936649, guid: d07137a0c5a331241b38dfa1f272a977, type: 3}
   sp_item_box:
