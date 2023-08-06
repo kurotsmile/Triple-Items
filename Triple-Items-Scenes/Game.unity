@@ -1896,6 +1896,7 @@ MonoBehaviour:
   - {fileID: 1969912894, guid: 9c1883bfd6a3148489e5f671790b750a, type: 3}
   - {fileID: 421363392, guid: 9c1883bfd6a3148489e5f671790b750a, type: 3}
   - {fileID: -1149591686, guid: 9c1883bfd6a3148489e5f671790b750a, type: 3}
+  txt_scores: {fileID: 1919315599}
   tr_check:
   - {fileID: 2127185332}
   - {fileID: 1928274491}
