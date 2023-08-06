@@ -10,6 +10,7 @@ public class Games : MonoBehaviour
 
     [Header("Sounds")]
     public AudioSource soundBk;
+    public AudioSource[] sound;
 
     void Start()
     {
@@ -28,11 +29,16 @@ public class Games : MonoBehaviour
         this.carrot.Create_Setting();
     }
 
-    public void create_effect(Vector3 pos)
+    public void create_effect_explosie(Vector3 pos)
     {
         GameObject obj_effect = Instantiate(this.effect_explosie);
         obj_effect.transform.SetParent(this.transform.root);
         obj_effect.transform.position = pos;
         obj_effect.transform.localScale = new Vector3(1f, 1f, 1f);
+    }
+
+    public void play_sound(int index_sound)
+    {
+        if(this.carrot.get_status_sound()) this.sound[index_sound].Play();
     }
 }

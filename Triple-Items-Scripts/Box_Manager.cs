@@ -3,6 +3,7 @@ using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Box_Manager : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class Box_Manager : MonoBehaviour
     public Transform area_body;
     public GameObject prefab_box_items;
     public Sprite[] sp_item_box;
+    public Text txt_scores;
+    private int scores=0;
 
     [Header("Tray check")]
     private int index_tray_check = 0;
@@ -26,7 +29,7 @@ public class Box_Manager : MonoBehaviour
         this.GetComponent<Games>().carrot.clear_contain(this.area_body);
         this.list_items_tray = new List<box_items>();
 
-        for(int i = 0; i < 30; i++)
+        for(int i = 0; i < 36; i++)
         {
             int index_rand = Random.Range(0, this.sp_item_box.Length);
             GameObject item_obj = Instantiate(this.prefab_box_items);
@@ -90,9 +93,11 @@ public class Box_Manager : MonoBehaviour
                 Debug.Log("Is True");
                 for (int i = 0; i < this.list_items_tray.Count; i++)
                 {
-                    this.game.create_effect(this.list_items_tray[i].transform.position);
+                    this.game.create_effect_explosie(this.list_items_tray[i].transform.position);
+                    Destroy(this.list_items_tray[i].gameObject);
                 }
-                
+                this.game.play_sound(0);
+                this.add_scores();
             }
             else
             {
@@ -101,10 +106,17 @@ public class Box_Manager : MonoBehaviour
                     this.list_items_tray[i].give_up(this.area_body);
                 }
                 Debug.Log("Is false");
+                this.game.play_sound(1);
             };
             this.list_items_tray = new List<box_items>();
             this.index_tray_check = 0;
         }
+    }
+
+    private void add_scores()
+    {
+        this.scores++;
+        this.txt_scores.text = "Scores:" + this.scores;
     }
 
 }
