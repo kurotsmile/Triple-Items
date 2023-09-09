@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class Box_Manager : MonoBehaviour
 {
     public Games game;
+    public GameObject panel_loading;
 
     [Header("Icons")]
     public Sprite sp_icon_all_style;
@@ -22,7 +23,6 @@ public class Box_Manager : MonoBehaviour
     private int scores=0;
 
     [Header("Tray check")]
-    private int index_tray_check =0;
     public Transform[] tr_check;
     private List<box_items> list_items_tray;
     private List<Sprite> list_sp_icon;
@@ -51,6 +51,8 @@ public class Box_Manager : MonoBehaviour
             item_obj.GetComponent<box_items>().set_color_bk(Color.white);
         }
 
+
+        this.panel_loading.SetActive(false);
         this.check_scores();
     }
 
@@ -161,21 +163,20 @@ public class Box_Manager : MonoBehaviour
         }
     }
 
-    public Transform get_tr_tray_cur() 
+    public Transform get_tr_tray_none() 
     {
-        return this.tr_check[this.index_tray_check].transform;
-    }
-
-    public void next_check_item()
-    {
-        this.index_tray_check++;
+        for(int i = 0; i < this.tr_check.Length; i++)
+        {
+            if (this.tr_check[i].childCount==0) return this.tr_check[i].transform;
+        }
+        return null;
     }
 
     public void add_box_to_tray(box_items box_item)
     {
+        this.panel_loading.SetActive(false);
         this.list_items_tray.Add(box_item);
-        this.index_tray_check++;
-        if (this.index_tray_check >= 3)
+        if (this.list_items_tray.Count>=3)
         {
             bool is_true = true;
             int type_box = this.list_items_tray[0].get_type_box();
@@ -208,7 +209,6 @@ public class Box_Manager : MonoBehaviour
                 this.game.play_sound(1);
             };
             this.list_items_tray = new List<box_items>();
-            this.index_tray_check = 0;
         }
     }
 
@@ -278,5 +278,11 @@ public class Box_Manager : MonoBehaviour
     private void create_effect_creater_box_item()
     {
         this.game.create_effect(this.obj_Item_Cur.transform.position, 1);
+    }
+
+    public void return_box_for_body(Transform tr_child)
+    {
+        tr_child.SetParent(this.area_body);
+        tr_child.SetSiblingIndex(this.max_box_item / 2);
     }
 }

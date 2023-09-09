@@ -11,6 +11,7 @@ public class box_items : MonoBehaviour
 {
     public Image img_icon;
     public Image img_border;
+    public GameObject obj_effect_move;
 
     private bool is_move = false;
     private float speed_move = 5.2f;
@@ -24,8 +25,10 @@ public class box_items : MonoBehaviour
     {
         GameObject.Find("Games").GetComponent<Games>().carrot.play_sound_click();
         this.transform.SetParent(this.transform.root);
-        this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_cur();
+        GameObject.Find("Games").GetComponent<Games>().boxs.panel_loading.SetActive(true);
+        this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_none();
         this.is_move = true;
+        this.obj_effect_move.SetActive(true);
     }
 
     public void set_data(Sprite sp_icon,int type) 
@@ -43,7 +46,7 @@ public class box_items : MonoBehaviour
     {
         this.status_type = box_status_type;
         if (this.status_type == box_status_type.in_body)
-            this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_cur();
+            this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_none();
         else
             this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.area_body;
     }
@@ -57,6 +60,7 @@ public class box_items : MonoBehaviour
             if (transform.position == tr_target.position)
             {
                 this.is_move = false;
+                this.obj_effect_move.SetActive(false);
                 if (this.status_type == box_status_type.in_body)
                 {
                     if (this.is_done_check)
@@ -67,18 +71,17 @@ public class box_items : MonoBehaviour
                     else
                     {
                         this.is_done_check = true;
-                        this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_cur());
+                        this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_none());
                         GameObject.Find("Games").GetComponent<Games>().boxs.add_box_to_tray(this);
                     }
                 }
                 else
                 {
-                    this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.area_body);
+                    GameObject.Find("Games").GetComponent<Games>().boxs.return_box_for_body(this.transform);
                     this.is_done_check = false;
                     this.status_type = box_status_type.in_body;
                     GameObject.Find("Games").GetComponent<Games>().boxs.create_box_item_missing_for_body();
                 }
-
             }
         }
     }
