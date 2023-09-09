@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Games : MonoBehaviour
 {
     public Carrot.Carrot carrot;
     public Box_Manager boxs;
-    public GameObject effect_explosie;
+    public GameObject[] effect_prefab;
 
     [Header("Sounds")]
     public AudioSource soundBk;
@@ -29,9 +27,9 @@ public class Games : MonoBehaviour
         this.carrot.Create_Setting();
     }
 
-    public void create_effect_explosie(Vector3 pos)
+    public void create_effect(Vector3 pos,int index=0)
     {
-        GameObject obj_effect = Instantiate(this.effect_explosie);
+        GameObject obj_effect = Instantiate(this.effect_prefab[index]);
         obj_effect.transform.SetParent(this.transform.root);
         obj_effect.transform.position = pos;
         obj_effect.transform.localScale = new Vector3(1f, 1f, 1f);

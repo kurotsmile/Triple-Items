@@ -1,16 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
+using Carrot;
 using UnityEngine;
 using UnityEngine.UI;
+
+public enum box_status_type
+{
+    in_tray,in_body
+}
 
 public class box_items : MonoBehaviour
 {
     public Image img_icon;
+    public Image img_border;
+
     private bool is_move = false;
     private float speed_move = 5.2f;
     private Transform tr_target;
     private int type = -1;
+    private int type_color = 0;
     private bool is_done_check = false;
+    private box_status_type status_type;
 
     public void click()
     {
@@ -20,10 +28,24 @@ public class box_items : MonoBehaviour
         this.is_move = true;
     }
 
-    public void set_data(Sprite sp_icon,int type)
+    public void set_data(Sprite sp_icon,int type) 
     {
         this.img_icon.sprite = sp_icon;
         this.type = type;
+    }
+
+    public void on_move()
+    {
+        this.is_move = true;
+    }
+
+    public void set_type(box_status_type box_status_type)
+    {
+        this.status_type = box_status_type;
+        if (this.status_type == box_status_type.in_body)
+            this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_cur();
+        else
+            this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.area_body;
     }
 
     private void Update()
@@ -35,17 +57,28 @@ public class box_items : MonoBehaviour
             if (transform.position == tr_target.position)
             {
                 this.is_move = false;
-                if (this.is_done_check)
+                if (this.status_type == box_status_type.in_body)
                 {
-                    this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.area_body);
-                    this.is_done_check = false;
+                    if (this.is_done_check)
+                    {
+                        this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.area_body);
+                        this.is_done_check = false;
+                    }
+                    else
+                    {
+                        this.is_done_check = true;
+                        this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_cur());
+                        GameObject.Find("Games").GetComponent<Games>().boxs.add_box_to_tray(this);
+                    }
                 }
                 else
                 {
-                    this.is_done_check = true;
-                    this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_cur());
-                    GameObject.Find("Games").GetComponent<Games>().boxs.add_box_to_tray(this);
+                    this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.area_body);
+                    this.is_done_check = false;
+                    this.status_type = box_status_type.in_body;
+                    GameObject.Find("Games").GetComponent<Games>().boxs.create_box_item_missing_for_body();
                 }
+
             }
         }
     }
@@ -59,5 +92,20 @@ public class box_items : MonoBehaviour
     public int get_type_box()
     {
         return this.type;
+    }
+
+    public void set_color_bk(Color32 color_set)
+    {
+        this.img_border.color = color_set;
+    }
+
+    public int get_type_color()
+    {
+        return this.type_color;
+    }
+
+    public void level_Up()
+    {
+        this.type_color++;
     }
 }
