@@ -31,7 +31,7 @@ public class Box_Manager : MonoBehaviour
     private int length_icon_in_categegory = 0;
     private int count_download_icon = 0;
 
-    private int max_box_item = 48;
+    private int max_box_item = 128;
     private GameObject obj_Item_Cur = null;
 
     public void on_load()
@@ -247,11 +247,11 @@ public class Box_Manager : MonoBehaviour
         item_obj.GetComponent<box_items>().set_color_bk(color_next);
         item_obj.GetComponent<box_items>().level_Up();
         item_obj.GetComponent<box_items>().on_move();
+        this.game.carrot.ads.show_ads_Interstitial();
     }
 
     public void create_box_item_missing_for_body()
     {
-        Debug.Log("Leng item live:" + this.area_body.childCount);
         int count_item_box_live = this.area_body.childCount;
         int count_item_box_missing = this.max_box_item - count_item_box_live;
         if (count_item_box_missing > 0)
