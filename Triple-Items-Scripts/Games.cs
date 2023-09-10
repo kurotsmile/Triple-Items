@@ -50,4 +50,12 @@ public class Games : MonoBehaviour
     {
         this.carrot.user.show_login();
     }
+
+    public void update_score_to_server(int score)
+    {
+        if (Random.Range(0, 3) == 1)
+        {
+            this.carrot.game.update_scores_player(score);
+        }
+    }
 }

@@ -31,7 +31,7 @@ public class Box_Manager : MonoBehaviour
     private int length_icon_in_categegory = 0;
     private int count_download_icon = 0;
 
-    private int max_box_item = 128;
+    private int max_box_item = 82;
     private GameObject obj_Item_Cur = null;
 
     public void on_load()
@@ -216,6 +216,7 @@ public class Box_Manager : MonoBehaviour
     {
         this.scores++;
         this.check_scores();
+        this.game.update_score_to_server(this.scores);
     }
 
     private void check_scores()
