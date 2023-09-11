@@ -65,6 +65,7 @@ public class box_items : MonoBehaviour
                     if (this.is_done_check)
                     {
                         this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.area_body_all_item);
+                        GameObject.Find("Games").GetComponent<Games>().boxs.panel_loading.SetActive(false);
                         this.is_done_check = false;
                     }
                     else

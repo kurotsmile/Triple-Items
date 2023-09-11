@@ -243,6 +243,7 @@ public class Box_Manager : MonoBehaviour
                 this.game.play_sound(1);
             };
             this.list_items_tray = new List<box_items>();
+            this.panel_loading.SetActive(true);
         }
     }
 
@@ -294,6 +295,7 @@ public class Box_Manager : MonoBehaviour
             this.create_box_item_in_body();
             this.create_box_item_in_body();
         }
+        this.panel_loading.SetActive(false);
     }
 
     private void create_box_item_in_body()
