@@ -14,6 +14,7 @@ public class Games : MonoBehaviour
     {
         this.carrot.Load_Carrot(this.check_exit_app);
         this.carrot.game.load_bk_music(this.soundBk);
+        this.carrot.shop.onCarrotPaySuccess += this.boxs.pay_success_category_icon;
         this.boxs.on_load();
     }
 

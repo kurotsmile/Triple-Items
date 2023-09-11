@@ -1,4 +1,3 @@
-using Carrot;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,7 +47,7 @@ public class box_items : MonoBehaviour
         if (this.status_type == box_status_type.in_body)
             this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.get_tr_tray_none();
         else
-            this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.area_body;
+            this.tr_target = GameObject.Find("Games").GetComponent<Games>().boxs.area_body_all_scroll;
     }
 
     private void Update()
@@ -65,7 +64,7 @@ public class box_items : MonoBehaviour
                 {
                     if (this.is_done_check)
                     {
-                        this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.area_body);
+                        this.transform.SetParent(GameObject.Find("Games").GetComponent<Games>().boxs.area_body_all_item);
                         this.is_done_check = false;
                     }
                     else

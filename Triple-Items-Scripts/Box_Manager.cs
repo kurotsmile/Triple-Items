@@ -15,7 +15,8 @@ public class Box_Manager : MonoBehaviour
     public Sprite sp_icon_buy;
 
     [Header("Obj Main")]
-    public Transform area_body;
+    public Transform area_body_all_item;
+    public Transform area_body_all_scroll;
     public GameObject prefab_box_items;
     public Sprite[] sp_item_box;
     public Color32[] color_bk_box;
@@ -33,17 +34,18 @@ public class Box_Manager : MonoBehaviour
 
     private int max_box_item = 82;
     private GameObject obj_Item_Cur = null;
+    private string s_key_category_shop_temp = "";
 
     public void on_load()
     {
-        this.GetComponent<Games>().carrot.clear_contain(this.area_body);
+        this.GetComponent<Games>().carrot.clear_contain(this.area_body_all_item);
         this.list_items_tray = new List<box_items>();
 
-        for(int i = 0; i < max_box_item; i++)
+        for(int i = 0; i < max_box_item; i++) 
         {
             int index_rand = Random.Range(0, this.sp_item_box.Length);
             GameObject item_obj = Instantiate(this.prefab_box_items);
-            item_obj.transform.SetParent(this.area_body);
+            item_obj.transform.SetParent(this.area_body_all_item);
             item_obj.transform.localPosition = new Vector3(0, 0, 0);
             item_obj.transform.localScale = new Vector3(1f, 1f, 1f);
             item_obj.GetComponent<box_items>().set_type(box_status_type.in_body);
@@ -56,6 +58,8 @@ public class Box_Manager : MonoBehaviour
         this.check_scores();
     }
 
+
+    #region List Category Icon
     public void change_style_box()
     {
         this.game.carrot.show_loading();
@@ -75,12 +79,15 @@ public class Box_Manager : MonoBehaviour
                     IDictionary icon_data=documentSnapshot.ToDictionary();
                     Carrot.Carrot_Box_Item item_cat= this.box_list_style_icon.create_item("item_icon");
                     item_cat.set_icon(this.sp_icon_all_style);
+                    string s_key;
+                    var key_cat = "";
                     if (icon_data["key"] != null)
                     {
-                        var key_cat = icon_data["key"].ToString();
+                        s_key = icon_data["key"].ToString();
+                        key_cat = s_key;
                         item_cat.set_title(icon_data["key"].ToString());
                         item_cat.set_tip(icon_data["key"].ToString());
-                        item_cat.set_act(()=>this.download_icon_by_category(key_cat));
+                        
                         if (PlayerPrefs.GetString("data_cat_" + key_cat) != "")
                         {
                             Carrot.Carrot_Box_Btn_Item btn_data=item_cat.create_item();
@@ -96,11 +103,37 @@ public class Box_Manager : MonoBehaviour
                             Carrot.Carrot_Box_Btn_Item btn_buy = item_cat.create_item();
                             btn_buy.set_icon(this.sp_icon_buy);
                             btn_buy.set_color(this.game.carrot.color_highlight);
+                            item_cat.set_act(() => this.buy_category_icon(key_cat));
+                        }
+                        else
+                        {
+                            item_cat.set_act(() => this.download_icon_by_category(key_cat));
                         }
                     }
+                    else
+                    {
+                        item_cat.set_act(() => this.download_icon_by_category(key_cat));
+                    }
                 };
+
+                this.box_list_style_icon.update_color_table_row();
             }
         });
+    }
+
+    private void buy_category_icon(string s_key)
+    {
+        this.s_key_category_shop_temp = s_key;
+        this.game.carrot.shop.buy_product(2);
+    }
+
+    public void pay_success_category_icon(string s_id)
+    {
+        if (s_id == this.game.carrot.shop.get_id_by_index(2))
+        {
+            this.download_icon_by_category(this.s_key_category_shop_temp);
+            this.s_key_category_shop_temp = "";
+        }
     }
 
     private void download_icon_by_category(string s_key_category)
@@ -162,6 +195,7 @@ public class Box_Manager : MonoBehaviour
             this.change_icon_for_list_box();
         }
     }
+    #endregion
 
     public Transform get_tr_tray_none() 
     {
@@ -203,7 +237,7 @@ public class Box_Manager : MonoBehaviour
             {
                 for (int i = 0; i < this.list_items_tray.Count; i++)
                 {
-                    this.list_items_tray[i].give_up(this.area_body);
+                    this.list_items_tray[i].give_up(this.area_body_all_item);
                 }
                 Debug.Log("Is false");
                 this.game.play_sound(1);
@@ -226,7 +260,7 @@ public class Box_Manager : MonoBehaviour
 
     private void change_icon_for_list_box()
     {
-        foreach(Transform child in this.area_body)
+        foreach(Transform child in this.area_body_all_item)
         {
             int rand_index = Random.Range(0, this.list_sp_icon.Count);
             child.GetComponent<box_items>().set_data(this.list_sp_icon[rand_index],rand_index);
@@ -253,7 +287,7 @@ public class Box_Manager : MonoBehaviour
 
     public void create_box_item_missing_for_body()
     {
-        int count_item_box_live = this.area_body.childCount;
+        int count_item_box_live = this.area_body_all_item.childCount;
         int count_item_box_missing = this.max_box_item - count_item_box_live;
         if (count_item_box_missing > 0)
         {
@@ -266,7 +300,7 @@ public class Box_Manager : MonoBehaviour
     {
         int index_rand = Random.Range(0, this.sp_item_box.Length);
         GameObject item_obj = Instantiate(this.prefab_box_items);
-        item_obj.transform.SetParent(this.area_body);
+        item_obj.transform.SetParent(this.area_body_all_item);
         item_obj.transform.localPosition = new Vector3(0, 0, 0);
         item_obj.transform.localScale = new Vector3(1f, 1f, 1f);
         item_obj.GetComponent<box_items>().set_type(box_status_type.in_body);
@@ -283,7 +317,7 @@ public class Box_Manager : MonoBehaviour
 
     public void return_box_for_body(Transform tr_child)
     {
-        tr_child.SetParent(this.area_body);
+        tr_child.SetParent(this.area_body_all_item);
         tr_child.SetSiblingIndex(this.max_box_item / 2);
     }
 }
