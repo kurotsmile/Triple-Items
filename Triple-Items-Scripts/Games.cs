@@ -10,6 +10,9 @@ public class Games : MonoBehaviour
     public AudioSource soundBk;
     public AudioSource[] sound;
 
+    [Header("Animations")]
+    public Animator anim;
+
     void Start()
     {
         this.carrot.Load_Carrot(this.check_exit_app);
