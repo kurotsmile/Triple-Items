@@ -32,13 +32,13 @@ public class Games : MonoBehaviour
         this.carrot.Create_Setting();
     }
 
-    public GameObject create_effect(Vector3 pos,int index=0,float scale=1f)
+    public void CreateEffect(Vector3 pos,int index=0,float scale=1f)
     {
         GameObject obj_effect = Instantiate(this.effect_prefab[index]);
         obj_effect.transform.SetParent(this.transform.root);
         obj_effect.transform.position = pos;
         obj_effect.transform.localScale = new Vector3(scale, scale,scale);
-        return obj_effect;
+        Destroy(obj_effect,1f);
     }
 
     public void play_sound(int index_sound)
