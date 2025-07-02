@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fc7471c908cd74346aa0d6a8cf155212
+timeCreated: 1481856388
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 83179
+  packageName: Starter Particle Pack
+  packageVersion: 1.1
+  assetPath: Assets/StarterParticles/SCENES/ExampleWithClickableButton.unity
+  uploadId: 404669

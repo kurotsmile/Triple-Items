@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 86bf5ea41080346548038b8102b367d0
+timeCreated: 1486584955
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 83179
+  packageName: Starter Particle Pack
+  packageVersion: 1.1
+  assetPath: Assets/StarterParticles/Prefabs/VfxBoltLightning.prefab
+  uploadId: 404669

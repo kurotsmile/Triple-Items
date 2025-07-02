@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bab2f13eaaf31454aafa3d30787c5b15
+timeCreated: 1482440729
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 83179
+  packageName: Starter Particle Pack
+  packageVersion: 1.1
+  assetPath: Assets/StarterParticles/Prefabs/ParticleTrail.prefab
+  uploadId: 404669

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a4bf31caa01e8489e9715de95b7b9522
+timeCreated: 1482960544
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 83179
+  packageName: Starter Particle Pack
+  packageVersion: 1.1
+  assetPath: Assets/StarterParticles/Materials/CamFlash.mat
+  uploadId: 404669

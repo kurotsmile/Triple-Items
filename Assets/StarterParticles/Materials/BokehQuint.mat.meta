@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2457b0d8c738e419ca3b1ad562f48fe0
+timeCreated: 1481768416
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 83179
+  packageName: Starter Particle Pack
+  packageVersion: 1.1
+  assetPath: Assets/StarterParticles/Materials/BokehQuint.mat
+  uploadId: 404669

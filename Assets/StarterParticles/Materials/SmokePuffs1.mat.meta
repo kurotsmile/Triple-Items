@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 77f3d6625c44647da8e5c503bea7d4c6
+timeCreated: 1482961092
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 83179
+  packageName: Starter Particle Pack
+  packageVersion: 1.1
+  assetPath: Assets/StarterParticles/Materials/SmokePuffs1.mat
+  uploadId: 404669

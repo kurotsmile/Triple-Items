@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d350ad29b27c64ecbad769fd1feff30a
+timeCreated: 1486681639
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 83179
+  packageName: Starter Particle Pack
+  packageVersion: 1.1
+  assetPath: Assets/StarterParticles/Prefabs/VfxStarWide.prefab
+  uploadId: 404669

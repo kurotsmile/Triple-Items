@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b886a92db5d5e4816856f7e8c0b7f053
+timeCreated: 1486681741
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 83179
+  packageName: Starter Particle Pack
+  packageVersion: 1.1
+  assetPath: Assets/StarterParticles/Prefabs/VfxParticleLoResDust.prefab
+  uploadId: 404669

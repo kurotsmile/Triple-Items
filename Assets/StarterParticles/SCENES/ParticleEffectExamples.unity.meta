@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4f1f38990d5c24b4aaaba3fa1e642aa4
+timeCreated: 1481856388
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 83179
+  packageName: Starter Particle Pack
+  packageVersion: 1.1
+  assetPath: Assets/StarterParticles/SCENES/ParticleEffectExamples.unity
+  uploadId: 404669
