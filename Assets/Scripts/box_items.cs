@@ -21,11 +21,7 @@ public class box_items : MonoBehaviour
 
     public void click()
     {
-        if (this.status == BoxStatusType.open)
-        {
-            this.CloseBox();
-            this.act?.Invoke();
-        }
+        if (this.status == BoxStatusType.open) this.act?.Invoke();
     }
 
     public void set_data(Sprite sp_icon, int type)
