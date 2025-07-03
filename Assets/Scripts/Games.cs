@@ -43,6 +43,7 @@ public class Games : MonoBehaviour
 
     public void btn_setting()
     {
+        this.ads.show_ads_Interstitial();
         this.carrot.Create_Setting();
     }
 
@@ -60,19 +61,9 @@ public class Games : MonoBehaviour
         if (this.carrot.get_status_sound()) this.sound[index_sound].Play();
     }
 
-    public void btn_top_player()
-    {
-        this.play_sound(0);
-        this.carrot.game.Show_List_Top_player();
-    }
-
-    public void btn_user_login()
-    {
-        this.carrot.user.show_login();
-    }
-
     public void BtnHistory()
     {
+        this.ads.show_ads_Interstitial();
         this.carrot.play_sound_click();
         this.history.ShowList();
     }

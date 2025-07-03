@@ -24,7 +24,7 @@ public class History : MonoBehaviour
     public void ShowList()
     {
         List<IDictionary> listHistory = new();
-        IDictionary dataTopPlayer =null;
+        IDictionary dataTopPlayer = null;
         int socerMax = 0;
         for (int i = 0; i < this.Length; i++)
         {
@@ -42,6 +42,7 @@ public class History : MonoBehaviour
             }
         }
 
+        game.boxs.IsPlay = false;
         Carrot_Box box = game.carrot.Create_Box();
         box.set_icon(game.spIconHistory);
         box.set_title("History");
@@ -55,12 +56,17 @@ public class History : MonoBehaviour
             ItemHistoryTop.GetComponent<Image>().color = this.colorTopPlayer;
         }
 
-        for (int i = listHistory.Count-1; i>=0; i--)
+        for (int i = listHistory.Count - 1; i >= 0; i--)  
         {
             Carrot_Box_Item ItemHistory = box.create_item();
             ItemHistory.set_icon(game.spIconHistoryPlay);
             ItemHistory.set_title("Score : " + listHistory[i]["value"].ToString());
             ItemHistory.set_tip(listHistory[i]["date"].ToString());
         }
+
+        box.set_act_before_closing(() =>
+        {
+            game.boxs.IsPlay = true;
+        });
     }
 }

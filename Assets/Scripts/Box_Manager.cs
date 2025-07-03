@@ -17,6 +17,7 @@ public class Box_Manager : MonoBehaviour
 
     [Header("Ui")]
     public Slider sliderTimer;
+    public Image imgBkStatus;
 
     [Header("Obj Main")]
     public Transform area_body_all_item;
@@ -25,6 +26,7 @@ public class Box_Manager : MonoBehaviour
     public Sprite[] sp_item_box;
     public Color32[] color_bk_box;
     public Text txt_scores;
+    public GameObject objBtnClear;
     private int scores = 0;
 
     [Header("Tray check")]
@@ -37,12 +39,20 @@ public class Box_Manager : MonoBehaviour
     private int max_box_item = 82;
     private GameObject obj_Item_Cur = null;
     private float TimerSpeed = 1.2f;
-    private bool IsPlay = true;
+    public bool IsPlay = true;
 
     public void on_load()
     {
         this.PanelGameOver.SetActive(false);
         this.PanelGamePause.SetActive(false);
+        this.CreateTable();
+    }
+
+    private void CreateTable()
+    {
+        this.IsPlay = true;
+        this.sliderTimer.value = 1;
+        this.objBtnClear.SetActive(false);
         this.list_sp_icon = new List<Sprite>();
 
         for (int i = 0; i < this.sp_item_box.Length; i++) this.list_sp_icon.Add(this.sp_item_box[i]);
@@ -61,10 +71,9 @@ public class Box_Manager : MonoBehaviour
             item_obj.GetComponent<box_items>().set_data(this.list_sp_icon[index_rand], index_rand);
             item_obj.GetComponent<box_items>().set_color_bk(Color.white);
         }
-
+        this.scores = 0;
         this.panel_loading.SetActive(false);
         this.check_scores();
-        this.IsPlay = true;
     }
 
     public Transform get_tr_tray_none()
@@ -78,10 +87,12 @@ public class Box_Manager : MonoBehaviour
 
     public void add_box_to_tray(box_items box_item)
     {
+        this.objBtnClear.SetActive(true);
         this.panel_loading.SetActive(false);
         this.list_items_tray.Add(box_item);
         if (this.list_items_tray.Count >= 3)
         {
+            this.objBtnClear.SetActive(false);
             bool is_true = true;
             int type_box = this.list_items_tray[0].get_type_box();
             int type_color_box = this.list_items_tray[0].get_type_color();
@@ -98,7 +109,7 @@ public class Box_Manager : MonoBehaviour
                 {
                     this.game.CreateEffect(this.list_items_tray[i].transform.position, 0, 0.3f);
                     Destroy(this.list_items_tray[i].gameObject);
-                    
+
                 }
                 this.sliderTimer.value += 0.2f;
                 this.game.play_sound(0);
@@ -119,7 +130,6 @@ public class Box_Manager : MonoBehaviour
                 this.sliderTimer.value -= 0.2f;
                 this.game.play_sound(1);
             }
-            ;
             this.list_items_tray = new List<box_items>();
             this.panel_loading.SetActive(true);
         }
@@ -200,10 +210,16 @@ public class Box_Manager : MonoBehaviour
             {
                 this.sliderTimer.value -= 0.01f;
                 this.TimerSpeed = 0f;
+                if (sliderTimer.value > 0.5f)
+                    imgBkStatus.color = Color.black;
+                else
+                    imgBkStatus.color = Color.red;
             }
 
             if (this.sliderTimer.value <= 0)
             {
+                this.game.play_sound(2);
+                this.game.carrot.play_vibrate();
                 this.sliderTimer.value = 0;
                 this.IsPlay = false;
                 this.PanelGameOver.SetActive(true);
@@ -214,18 +230,17 @@ public class Box_Manager : MonoBehaviour
                     dataScore["value"] = this.scores.ToString();
                     this.game.history.Add(dataScore);
                 }
+                this.game.ads.show_ads_Interstitial();
             }
         }
     }
 
     public void BtnPlayAgain()
     {
+        this.game.ads.show_ads_Interstitial();
         this.game.carrot.play_sound_click();
         this.PanelGameOver.SetActive(false);
-        this.IsPlay = true;
-        this.sliderTimer.value = 1;
-        this.scores=0;
-        this.check_scores();
+        this.CreateTable();
     }
 
     public void BtnContinue()
@@ -233,6 +248,7 @@ public class Box_Manager : MonoBehaviour
         this.game.carrot.play_sound_click();
         this.IsPlay = true;
         this.PanelGamePause.SetActive(false);
+        this.game.ads.show_ads_Interstitial();
     }
 
     public void BtnPause()
@@ -240,5 +256,16 @@ public class Box_Manager : MonoBehaviour
         this.game.carrot.play_sound_click();
         this.IsPlay = false;
         this.PanelGamePause.SetActive(true);
+    }
+
+    public void BtnClear()
+    {
+        this.game.carrot.play_sound_click();
+        for (int i = 0; i < this.list_items_tray.Count; i++)
+        {
+            Destroy(this.list_items_tray[i].gameObject);
+        }
+        this.list_items_tray = new List<box_items>();
+        this.objBtnClear.SetActive(false);
     }
 }

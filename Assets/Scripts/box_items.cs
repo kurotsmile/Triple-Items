@@ -54,6 +54,7 @@ public class box_items : MonoBehaviour
     {
         if (this.is_move)
         {
+            if (tr_target == null) return;
             transform.position = Vector3.MoveTowards(this.transform.position, tr_target.position, this.speed_move * Time.deltaTime);
 
             if (transform.position == tr_target.position)
