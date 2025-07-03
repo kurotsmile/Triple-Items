@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Carrot;
+using Unity.Burst.Intrinsics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,7 @@ public class Box_Manager : MonoBehaviour
     public GameObject panel_loading;
     public GameObject PanelGameOver;
     public GameObject PanelGamePause;
+    public GameObject BoxItemEffectPrefab;
 
     [Header("Icons")]
     public Sprite sp_icon_all_style;
@@ -31,7 +33,7 @@ public class Box_Manager : MonoBehaviour
 
     [Header("Tray check")]
     public Transform[] tr_check;
-    private List<box_items> list_items_tray;
+    private List<box_items_effect> list_items_tray;
     private List<Sprite> list_sp_icon;
 
     [Header("Msg Scores")]
@@ -58,7 +60,7 @@ public class Box_Manager : MonoBehaviour
         for (int i = 0; i < this.sp_item_box.Length; i++) this.list_sp_icon.Add(this.sp_item_box[i]);
 
         this.GetComponent<Games>().carrot.clear_contain(this.area_body_all_item);
-        this.list_items_tray = new List<box_items>();
+        this.list_items_tray = new List<box_items_effect>();
 
         for (int i = 0; i < max_box_item; i++)
         {
@@ -67,56 +69,106 @@ public class Box_Manager : MonoBehaviour
             item_obj.transform.SetParent(this.area_body_all_item);
             item_obj.transform.localPosition = new Vector3(0, 0, 0);
             item_obj.transform.localScale = new Vector3(1f, 1f, 1f);
-            item_obj.GetComponent<box_items>().set_type(box_status_type.in_body);
-            item_obj.GetComponent<box_items>().set_data(this.list_sp_icon[index_rand], index_rand);
-            item_obj.GetComponent<box_items>().set_color_bk(Color.white);
+            box_items boxItem = item_obj.GetComponent<box_items>();
+            var b = boxItem;
+            boxItem.set_data(this.list_sp_icon[index_rand], index_rand);
+            boxItem.index = i;
+            boxItem.set_color_bk(Color.white);
+            boxItem.SetActClick(() =>
+            {
+                game.CreateEffect(boxItem.transform.position, 2, 0.2f);
+                game.carrot.play_sound_click();
+
+                GameObject objBoxEffect = Instantiate(this.BoxItemEffectPrefab);
+                objBoxEffect.transform.SetParent(this.area_body_all_item);
+                objBoxEffect.transform.localPosition = boxItem.transform.localPosition;
+                objBoxEffect.transform.localScale = new Vector3(1f, 1f, 1f);
+                box_items_effect boxEffect = objBoxEffect.GetComponent<box_items_effect>();
+                int indexTrTaget = this.get_indext_tr_tray_none();
+                if (indexTrTaget != -1)
+                {
+                    boxEffect.indexTray = indexTrTaget;
+                    boxEffect.OnLoad(this.tr_check[indexTrTaget], b, boxEffect_status_type.in_body);
+                    boxEffect.img_border.color = color_bk_box[b.get_type_color()];
+                    this.add_box_to_tray(boxEffect);
+                }
+                else
+                    Destroy(objBoxEffect);
+            });
         }
         this.scores = 0;
         this.panel_loading.SetActive(false);
         this.check_scores();
     }
 
-    public Transform get_tr_tray_none()
+    public int get_indext_tr_tray_none()
     {
         for (int i = 0; i < this.tr_check.Length; i++)
         {
-            if (this.tr_check[i].childCount == 0) return this.tr_check[i].transform;
+            if (this.tr_check[i].childCount == 0) return i;
         }
-        return null;
+        return -1;
     }
 
-    public void add_box_to_tray(box_items box_item)
+    public int add_box_to_tray(box_items_effect box_item)
     {
         this.objBtnClear.SetActive(true);
         this.panel_loading.SetActive(false);
         this.list_items_tray.Add(box_item);
+        return this.list_items_tray.Count - 1;
+    }
+
+    public void CheckTray()
+    {
         if (this.list_items_tray.Count >= 3)
         {
             this.objBtnClear.SetActive(false);
             bool is_true = true;
-            int type_box = this.list_items_tray[0].get_type_box();
-            int type_color_box = this.list_items_tray[0].get_type_color();
+            int type_box = this.list_items_tray[0].boxItem.get_type_box();
+            int type_color_box = this.list_items_tray[0].boxItem.get_type_color();
 
             for (int i = 0; i < this.list_items_tray.Count; i++)
             {
-                if (type_box != this.list_items_tray[i].get_type_box() || type_color_box != this.list_items_tray[i].get_type_color()) is_true = false;
+                if (type_box != this.list_items_tray[i].boxItem.get_type_box() || type_color_box != this.list_items_tray[i].boxItem.get_type_color()) is_true = false;
             }
 
             if (is_true)
             {
+                List<box_items> listBoxGet = new();
                 Debug.Log("Is True");
                 for (int i = 0; i < this.list_items_tray.Count; i++)
                 {
-                    this.game.CreateEffect(this.list_items_tray[i].transform.position, 0, 0.3f);
+                    listBoxGet.Add(this.list_items_tray[i].boxItem);
+                    this.game.CreateEffect(this.list_items_tray[i].transform.position, Random.Range(0, 1), 0.3f);
                     Destroy(this.list_items_tray[i].gameObject);
-
                 }
+
                 this.sliderTimer.value += 0.2f;
                 this.game.play_sound(0);
 
                 int scores_add = (type_color_box + 1);
                 this.add_scores(scores_add);
-                this.create_box_item_in_tray(type_color_box);
+
+                for (int i = 0; i < listBoxGet.Count; i++)
+                {
+                    int index_rand = Random.Range(0, this.list_sp_icon.Count);
+                    listBoxGet[i].set_data(this.list_sp_icon[index_rand], index_rand);
+                }
+
+                int indexSelLevelUp = Random.Range(0, listBoxGet.Count);
+
+                GameObject objBoxEffect = Instantiate(this.BoxItemEffectPrefab);
+                objBoxEffect.transform.SetParent(this.list_items_tray[0].transform);
+                objBoxEffect.transform.localPosition = Vector3.zero;
+                objBoxEffect.transform.localScale = new Vector3(1f, 1f, 1f);
+                box_items_effect boxEffect = objBoxEffect.GetComponent<box_items_effect>();
+                int boxLevel = listBoxGet[indexSelLevelUp].level_Up();
+                box_items b = listBoxGet[indexSelLevelUp];
+                b.set_color_bk(this.color_bk_box[boxLevel]);
+                boxEffect.OnLoad(b.gameObject.transform, b, boxEffect_status_type.create);
+                boxEffect.img_border.color = color_bk_box[b.get_type_color()];
+                b.CloseBox();
+
                 this.txt_msg_scores.text = "x" + scores_add;
                 this.game.anim.Play("game_add_scores");
             }
@@ -124,15 +176,19 @@ public class Box_Manager : MonoBehaviour
             {
                 for (int i = 0; i < this.list_items_tray.Count; i++)
                 {
-                    this.list_items_tray[i].give_up(this.area_body_all_item);
+                    this.list_items_tray[i].give_up();
                 }
                 Debug.Log("Is false");
                 this.sliderTimer.value -= 0.2f;
                 this.game.play_sound(1);
             }
-            this.list_items_tray = new List<box_items>();
-            this.panel_loading.SetActive(true);
+            this.list_items_tray = new List<box_items_effect>();
         }
+    }
+
+    public void RemoveBoxToTray(int index)
+    {
+        this.list_items_tray.RemoveAt(index);
     }
 
     private void add_scores(int scores_add)
@@ -146,25 +202,8 @@ public class Box_Manager : MonoBehaviour
         this.txt_scores.text = "Scores:" + this.scores;
     }
 
-    private void create_box_item_in_tray(int type_color_box)
-    {
-        int index_rand = Random.Range(0, this.list_sp_icon.Count);
-        GameObject item_obj = Instantiate(this.prefab_box_items);
-        item_obj.transform.SetParent(this.tr_check[1]);
-        item_obj.transform.localPosition = new Vector3(0, 0, 0);
-        item_obj.transform.localScale = new Vector3(1f, 1f, 1f);
-        item_obj.GetComponent<box_items>().set_type(box_status_type.in_tray);
-        item_obj.GetComponent<box_items>().set_data(this.list_sp_icon[index_rand], index_rand);
 
-        int index_color_next = type_color_box + 1;
-        Color32 color_next = this.color_bk_box[index_color_next];
-        item_obj.GetComponent<box_items>().set_color_bk(color_next);
-        item_obj.GetComponent<box_items>().level_Up();
-        item_obj.GetComponent<box_items>().on_move();
-        this.game.ads.show_ads_Interstitial();
-    }
-
-    public void create_box_item_missing_for_body()
+    public void create_box_item_new_for_body()
     {
         int count_item_box_live = this.area_body_all_item.childCount;
         int count_item_box_missing = this.max_box_item - count_item_box_live;
@@ -183,7 +222,6 @@ public class Box_Manager : MonoBehaviour
         item_obj.transform.SetParent(this.area_body_all_item);
         item_obj.transform.localPosition = new Vector3(0, 0, 0);
         item_obj.transform.localScale = new Vector3(1f, 1f, 1f);
-        item_obj.GetComponent<box_items>().set_type(box_status_type.in_body);
         item_obj.GetComponent<box_items>().set_data(this.list_sp_icon[index_rand], index_rand);
         item_obj.GetComponent<box_items>().set_color_bk(Color.white);
         this.obj_Item_Cur = item_obj;
@@ -193,12 +231,6 @@ public class Box_Manager : MonoBehaviour
     private void create_effect_creater_box_item()
     {
         this.game.CreateEffect(this.obj_Item_Cur.transform.position, 1);
-    }
-
-    public void return_box_for_body(Transform tr_child)
-    {
-        tr_child.SetParent(this.area_body_all_item);
-        tr_child.SetSiblingIndex(this.max_box_item / 2);
     }
 
     void Update()
@@ -265,7 +297,7 @@ public class Box_Manager : MonoBehaviour
         {
             Destroy(this.list_items_tray[i].gameObject);
         }
-        this.list_items_tray = new List<box_items>();
+        this.list_items_tray = new List<box_items_effect>();
         this.objBtnClear.SetActive(false);
     }
 }

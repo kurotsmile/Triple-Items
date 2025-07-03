@@ -18,6 +18,7 @@ public class Games : MonoBehaviour
     [Header("Asset Icon")]
     public Sprite spIconHistory;
     public Sprite spIconHistoryPlay;
+    public Sprite spIconClear;
 
     void Start()
     {
