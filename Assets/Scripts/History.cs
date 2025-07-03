@@ -1,10 +1,13 @@
 using System.Collections;
+using System.Collections.Generic;
 using Carrot;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class History : MonoBehaviour
 {
     public Games game;
+    public Color32 colorTopPlayer;
     private int Length = 0;
     public void OnLoad()
     {
@@ -20,8 +23,44 @@ public class History : MonoBehaviour
 
     public void ShowList()
     {
+        List<IDictionary> listHistory = new();
+        IDictionary dataTopPlayer =null;
+        int socerMax = 0;
+        for (int i = 0; i < this.Length; i++)
+        {
+            string sHistoryData = PlayerPrefs.GetString("h_" + i);
+            if (sHistoryData != "")
+            {
+                IDictionary dataS = Json.Deserialize(sHistoryData) as IDictionary;
+                if (int.Parse(dataS["value"].ToString()) > socerMax)
+                {
+                    socerMax = int.Parse(dataS["value"].ToString());
+                    dataTopPlayer = dataS;
+                }
+
+                listHistory.Add(dataS);
+            }
+        }
+
         Carrot_Box box = game.carrot.Create_Box();
         box.set_icon(game.spIconHistory);
         box.set_title("History");
+
+        if (dataTopPlayer != null)
+        {
+            Carrot_Box_Item ItemHistoryTop = box.create_item();
+            ItemHistoryTop.set_icon(game.carrot.game.icon_top_player);
+            ItemHistoryTop.set_title("Highest Score : " + dataTopPlayer["value"].ToString());
+            ItemHistoryTop.set_tip(dataTopPlayer["date"].ToString());
+            ItemHistoryTop.GetComponent<Image>().color = this.colorTopPlayer;
+        }
+
+        for (int i = listHistory.Count-1; i>=0; i--)
+        {
+            Carrot_Box_Item ItemHistory = box.create_item();
+            ItemHistory.set_icon(game.spIconHistoryPlay);
+            ItemHistory.set_title("Score : " + listHistory[i]["value"].ToString());
+            ItemHistory.set_tip(listHistory[i]["date"].ToString());
+        }
     }
 }

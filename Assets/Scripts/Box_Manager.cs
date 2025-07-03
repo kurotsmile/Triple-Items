@@ -98,8 +98,9 @@ public class Box_Manager : MonoBehaviour
                 {
                     this.game.CreateEffect(this.list_items_tray[i].transform.position, 0, 0.3f);
                     Destroy(this.list_items_tray[i].gameObject);
-                    this.sliderTimer.value += 0.2f;
+                    
                 }
+                this.sliderTimer.value += 0.2f;
                 this.game.play_sound(0);
 
                 int scores_add = (type_color_box + 1);
@@ -115,6 +116,7 @@ public class Box_Manager : MonoBehaviour
                     this.list_items_tray[i].give_up(this.area_body_all_item);
                 }
                 Debug.Log("Is false");
+                this.sliderTimer.value -= 0.2f;
                 this.game.play_sound(1);
             }
             ;
@@ -205,9 +207,15 @@ public class Box_Manager : MonoBehaviour
                 this.sliderTimer.value = 0;
                 this.IsPlay = false;
                 this.PanelGameOver.SetActive(true);
+                if (this.scores > 0)
+                {
+                    IDictionary dataScore = Json.Deserialize("{}") as IDictionary;
+                    dataScore["date"] = System.DateTime.Now.ToString();
+                    dataScore["value"] = this.scores.ToString();
+                    this.game.history.Add(dataScore);
+                }
             }
         }
-
     }
 
     public void BtnPlayAgain()
@@ -216,6 +224,8 @@ public class Box_Manager : MonoBehaviour
         this.PanelGameOver.SetActive(false);
         this.IsPlay = true;
         this.sliderTimer.value = 1;
+        this.scores=0;
+        this.check_scores();
     }
 
     public void BtnContinue()
