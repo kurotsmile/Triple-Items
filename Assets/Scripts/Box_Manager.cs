@@ -1,7 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Carrot;
-using Unity.Burst.Intrinsics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,7 @@ public class Box_Manager : MonoBehaviour
     public GameObject PanelGameOver;
     public GameObject PanelGamePause;
     public GameObject BoxItemEffectPrefab;
+    public int MaxBoxItem = 60;
 
     [Header("Icons")]
     public Sprite sp_icon_all_style;
@@ -33,14 +35,15 @@ public class Box_Manager : MonoBehaviour
 
     [Header("Tray check")]
     public Transform[] tr_check;
-    private List<box_items_effect> list_items_tray = new List<box_items_effect>();
+    private List<box_items_effect> list_items_tray = new();
+    private List<box_items> listBox = new();
+    private List<GameObject> listFindHelp = new();
     private List<Sprite> list_sp_icon;
 
     [Header("Msg Scores")]
     public Text txt_msg_scores;
-    private int max_box_item = 82;
-    private GameObject obj_Item_Cur = null;
     private float TimerSpeed = 1.2f;
+    private float TimerHelp = 0f;
     public bool IsPlay = true;
     private bool IsCheck = false;
 
@@ -63,9 +66,9 @@ public class Box_Manager : MonoBehaviour
         this.ClearTray();
         this.GetComponent<Games>().carrot.clear_contain(this.area_body_all_item);
 
-        for (int i = 0; i < max_box_item; i++)
+        for (int i = 0; i < MaxBoxItem; i++)
         {
-            int index_rand = Random.Range(0, this.list_sp_icon.Count);
+            int index_rand = UnityEngine.Random.Range(0, this.list_sp_icon.Count);
             GameObject item_obj = Instantiate(this.prefab_box_items);
             item_obj.transform.SetParent(this.area_body_all_item);
             item_obj.transform.localPosition = new Vector3(0, 0, 0);
@@ -77,7 +80,8 @@ public class Box_Manager : MonoBehaviour
             boxItem.set_color_bk(Color.white);
             boxItem.SetActClick(() =>
             {
-                game.CreateEffect(boxItem.transform.position, 2, 0.2f);
+                this.ClearListHelp();
+                game.CreateEffect(boxItem.transform.position, 2, 0.2f, 0.5f);
                 game.carrot.play_sound_click();
                 int indexTrTaget = this.Get_index_tr_tray_null();
                 if (indexTrTaget != -1)
@@ -91,14 +95,37 @@ public class Box_Manager : MonoBehaviour
 
                     boxEffect.indexTray = indexTrTaget;
                     boxEffect.OnLoad(this.tr_check[indexTrTaget].transform, b, boxEffect_status_type.in_body);
-                    boxEffect.img_border.color = color_bk_box[b.get_type_color()];
+                    boxEffect.img_border.color = color_bk_box[b.type_color];
                     this.SetBoxToTray(boxEffect, indexTrTaget);
                 }
             });
+            listBox.Add(boxItem);
         }
         this.scores = 0;
         this.panel_loading.SetActive(false);
         this.check_scores();
+    }
+
+    private List<box_items> FindFirstTriple(List<box_items> boxes)
+    {
+        return boxes
+            .Where(b => b.status == BoxStatusType.open)
+            .GroupBy(b => new { b.type, b.type_color })
+            .FirstOrDefault(g => g.Count() >= 3)?
+            .Take(3)
+            .ToList();
+    }
+
+    private void ClearListHelp()
+    {
+        if (listFindHelp.Count > 0)
+        {
+            for (int i = 0; i < listFindHelp.Count; i++)
+            {
+                Destroy(listFindHelp[i].gameObject);
+            }
+            listFindHelp.Clear();
+        }
     }
 
     private int Get_index_tr_tray_null()
@@ -129,33 +156,34 @@ public class Box_Manager : MonoBehaviour
 
     public void CheckTray()
     {
-        if (this.CountTrayNotNull() >= 3&&this.IsCheck==false)
+        if (this.CountTrayNotNull() >= 3 && this.IsCheck == false)
         {
             this.objBtnClear.SetActive(false);
             this.IsCheck = true;
-            game.carrot.delay_function(1.5f, CheckAllBoxInTray);
+            game.carrot.delay_function(UnityEngine.Random.Range(1f, 1.5f), CheckAllBoxInTray);
         }
     }
 
     private void CheckAllBoxInTray()
     {
         bool is_true = true;
-        int type_box = this.list_items_tray[0].boxItem.get_type_box();
-        int type_color_box = this.list_items_tray[0].boxItem.get_type_color();
+        int type_box = this.list_items_tray[0].boxItem.type;
+        int type_color_box = this.list_items_tray[0].boxItem.type_color;
 
         for (int i = 0; i < this.list_items_tray.Count; i++)
         {
-            if (type_box != this.list_items_tray[i].boxItem.get_type_box() || type_color_box != this.list_items_tray[i].boxItem.get_type_color()) is_true = false;
+            if (type_box != this.list_items_tray[i].boxItem.type || type_color_box != this.list_items_tray[i].boxItem.type_color) is_true = false;
         }
 
         if (is_true)
         {
+            TimerHelp = 0f;
             List<box_items> listBoxGet = new();
             Debug.Log("Is True");
             for (int i = 0; i < this.list_items_tray.Count; i++)
             {
                 listBoxGet.Add(this.list_items_tray[i].boxItem);
-                this.game.CreateEffect(this.list_items_tray[i].transform.position, Random.Range(0, 1), 0.3f);
+                this.game.CreateEffect(this.list_items_tray[i].transform.position, UnityEngine.Random.Range(0, 1), 0.3f);
                 Destroy(this.list_items_tray[i].gameObject);
             }
 
@@ -165,14 +193,14 @@ public class Box_Manager : MonoBehaviour
             int scores_add = (type_color_box + 1);
             this.add_scores(scores_add);
 
+            int indexSelLevelUp = UnityEngine.Random.Range(0, listBoxGet.Count);
             for (int i = 0; i < listBoxGet.Count; i++)
             {
-                int index_rand = Random.Range(0, this.list_sp_icon.Count);
+                int index_rand = UnityEngine.Random.Range(0, this.list_sp_icon.Count);
                 listBoxGet[i].set_data(this.list_sp_icon[index_rand], index_rand);
                 listBoxGet[i].ReOpen();
+                if (indexSelLevelUp != i) listBoxGet[i].type_color = 0;
             }
-
-            int indexSelLevelUp = Random.Range(0, listBoxGet.Count);
 
             GameObject objBoxEffect = Instantiate(this.BoxItemEffectPrefab);
             objBoxEffect.transform.SetParent(this.list_items_tray[1].transform);
@@ -183,7 +211,7 @@ public class Box_Manager : MonoBehaviour
             box_items b = listBoxGet[indexSelLevelUp];
             b.set_color_bk(this.color_bk_box[boxLevel]);
             boxEffect.OnLoad(b.gameObject.transform, b, boxEffect_status_type.create);
-            boxEffect.img_border.color = color_bk_box[b.get_type_color()];
+            boxEffect.img_border.color = color_bk_box[b.type_color];
             b.CloseBox();
 
             this.txt_msg_scores.text = "x" + scores_add;
@@ -224,7 +252,7 @@ public class Box_Manager : MonoBehaviour
 
     void Update()
     {
-        if (this.IsPlay)
+        if (this.IsPlay && !this.IsCheck)
         {
             this.TimerSpeed += 0.1f;
             if (this.TimerSpeed > 3f)
@@ -252,6 +280,31 @@ public class Box_Manager : MonoBehaviour
                     this.game.history.Add(dataScore);
                 }
                 this.game.ads.show_ads_Interstitial();
+            }
+
+            if (listFindHelp.Count==0)
+            {
+                this.TimerHelp += 0.1f;
+                if (this.TimerHelp > 30f)
+                {
+                    Debug.Log("Tim help");
+                    List<box_items> listbox = this.FindFirstTriple(this.listBox);
+                    if (listbox.Count >= 0)
+                    {
+                        for (int i = 0; i < listbox.Count; i++)
+                        {
+                            if (listbox[i] != null)
+                            {
+                                GameObject obj_effect = Instantiate(game.effect_prefab[4]);
+                                obj_effect.transform.SetParent(listbox[i].gameObject.transform);
+                                obj_effect.transform.localPosition = Vector3.zero;
+                                obj_effect.transform.localScale = new Vector3(1f, 1f, 1f);
+                                listFindHelp.Add(obj_effect);
+                            }
+                        }
+                    }
+                    this.TimerHelp = 0;
+                }
             }
         }
     }

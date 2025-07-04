@@ -10,8 +10,8 @@ public class box_items : MonoBehaviour
     public Image img_none;
     public BoxStatusType status = BoxStatusType.open;
     public int index;
-    private int type = 0;
-    private int type_color = 0;
+    public int type = 0;
+    public int type_color = 0;
     private UnityAction act;
 
     public void SetActClick(UnityAction act)
@@ -31,20 +31,10 @@ public class box_items : MonoBehaviour
         this.img_icon.sprite = sp_icon;
         this.type = type;
     }
-
-    public int get_type_box()
-    {
-        return this.type;
-    }
-
+    
     public void set_color_bk(Color32 color_set)
     {
         this.img_border.color = color_set;
-    }
-
-    public int get_type_color()
-    {
-        return this.type_color;
     }
 
     public int level_Up()
