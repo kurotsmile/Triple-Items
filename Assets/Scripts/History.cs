@@ -68,7 +68,7 @@ public class History : MonoBehaviour
             {
                 Carrot_Box_Item ItemHistoryTop = box.create_item();
                 ItemHistoryTop.set_icon(game.carrot.game.icon_top_player);
-                ItemHistoryTop.set_title("Highest Score : " + dataTopPlayer["value"].ToString());
+                ItemHistoryTop.set_title("Highest Score : " + dataTopPlayer["value"].ToString()+" - "+" Mode: "+dataTopPlayer["mode"].ToString());
                 ItemHistoryTop.set_tip(dataTopPlayer["date"].ToString());
                 ItemHistoryTop.GetComponent<Image>().color = this.colorTopPlayer;
             }
@@ -77,7 +77,7 @@ public class History : MonoBehaviour
             {
                 Carrot_Box_Item ItemHistory = box.create_item();
                 ItemHistory.set_icon(game.spIconHistoryPlay);
-                ItemHistory.set_title("Score : " + listHistory[i]["value"].ToString());
+                ItemHistory.set_title("Score: " + listHistory[i]["value"].ToString()+" - "+" Mode: "+listHistory[i]["mode"].ToString());
                 ItemHistory.set_tip(listHistory[i]["date"].ToString());
             }
 

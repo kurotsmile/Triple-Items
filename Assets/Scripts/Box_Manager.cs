@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +24,7 @@ public class Box_Manager : MonoBehaviour
     public Sprite[] spCatFail;
 
     [Header("Ui")]
+    public Text TextNameMode;
     public Slider sliderTimer;
     public Image imgBkStatus;
     public GameObject objCatTrue;
@@ -57,7 +57,6 @@ public class Box_Manager : MonoBehaviour
 
     public void OnLoad()
     {
-        for (int i = 0; i < this.sp_item_box.Length; i++) this.list_sp_icon.Add(this.sp_item_box[i]);
         this.PanelGameOver.SetActive(false);
         this.PanelGamePause.SetActive(false);
         this.IsPlay = false;
@@ -73,6 +72,7 @@ public class Box_Manager : MonoBehaviour
             else objBoxChecks[i].SetActive(false);
         }
 
+        list_sp_icon = new();
         for (int i = 0; i < this.sp_item_box.Length; i++) this.list_sp_icon.Add(this.sp_item_box[i]);
         this.PanelGameOver.SetActive(false);
         this.PanelGamePause.SetActive(false);
@@ -225,7 +225,7 @@ public class Box_Manager : MonoBehaviour
         int type_box = this.list_items_tray[0].boxItem.type;
         int type_color_box = this.list_items_tray[0].boxItem.type_color;
 
-        for (int i = 0; i < this.list_items_tray.Count; i++)
+        for (int i = 0; i < MaxBoxTray; i++)
         {
             if (type_box != this.list_items_tray[i].boxItem.type || type_color_box != this.list_items_tray[i].boxItem.type_color) is_true = false;
         }
@@ -340,6 +340,7 @@ public class Box_Manager : MonoBehaviour
                     IDictionary dataScore = Json.Deserialize("{}") as IDictionary;
                     dataScore["date"] = System.DateTime.Now.ToString();
                     dataScore["value"] = this.scores.ToString();
+                    dataScore["mode"] = this.TextNameMode.text;
                     this.game.history.Add(dataScore);
                 }
                 this.game.ads.show_ads_Interstitial();

@@ -34,6 +34,11 @@ public class Games : MonoBehaviour
         this.history.OnLoad();
         this.panelHome.SetActive(true);
         this.panelPlay.SetActive(false);
+
+        this.ads.On_Load();
+        this.carrot.act_buy_ads_success = this.ads.RemoveAds;
+        this.carrot.game.act_click_watch_ads_in_music_bk = this.ads.ShowRewardedVideo;
+        this.ads.onRewardedSuccess = this.carrot.game.OnRewardedSuccess;
     }
 
     private void check_exit_app()
@@ -92,9 +97,23 @@ public class Games : MonoBehaviour
         this.carrot.play_sound_click();
         this.panelHome.SetActive(false);
         this.panelPlay.SetActive(true);
-        if (indexMode == 0) boxs.StartGame(30, 2);
-        if (indexMode == 1) boxs.StartGame(60, 3);
-        if (indexMode == 2) boxs.StartGame(68, 4);
+        if (indexMode == 0)
+        {
+            boxs.TextNameMode.text = "Easy mode";
+            boxs.StartGame(30, 2);
+        }
+
+        if (indexMode == 1)
+        {
+            boxs.TextNameMode.text = "Normal Mode";
+            boxs.StartGame(60, 3);
+        }
+
+        if (indexMode == 2)
+        {
+            boxs.TextNameMode.text = "Super Hard Mode";
+            boxs.StartGame(68, 4);
+        }
     }
 
     public void BtnOnBackHome()

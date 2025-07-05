@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4776960795343456808}
   - component: {fileID: 3856956451779633638}
   - component: {fileID: 3300475303601029142}
+  - component: {fileID: 5809006701921106597}
   m_Layer: 5
   m_Name: CatFoot
   m_TagString: Untagged
@@ -75,3 +76,17 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5809006701921106597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5478976447704738305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59027f27f80921746a8f03d38c7dcce0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fadeTime: 5
+  sr: {fileID: 3300475303601029142}
