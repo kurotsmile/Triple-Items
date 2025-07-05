@@ -83,7 +83,7 @@ public class History : MonoBehaviour
 
             box.set_act_before_closing(() =>
             {
-                game.boxs.IsPlay = true;
+                if(game.panelPlay.activeInHierarchy) game.boxs.IsPlay = true;
             });
         }
         else

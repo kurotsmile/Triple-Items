@@ -8,20 +8,27 @@ using UnityEngine.UI;
 
 public class Box_Manager : MonoBehaviour
 {
+    [Header("Obj Main")]
     public Games game;
     public GameObject panel_loading;
     public GameObject PanelGameOver;
     public GameObject PanelGamePause;
     public GameObject BoxItemEffectPrefab;
+    [Header("Config")]
     public int MaxBoxItem = 60;
+    public int MaxBoxTray= 3;
 
     [Header("Icons")]
     public Sprite sp_icon_all_style;
     public Sprite sp_icon_buy;
+    public Sprite[] spCatTrue;
+    public Sprite[] spCatFail;
 
     [Header("Ui")]
     public Slider sliderTimer;
     public Image imgBkStatus;
+    public GameObject objCatTrue;
+    public GameObject objCatFail;
 
     [Header("Obj Main")]
     public Transform area_body_all_item;
@@ -35,33 +42,76 @@ public class Box_Manager : MonoBehaviour
 
     [Header("Tray check")]
     public Transform[] tr_check;
+    public GameObject[] objBoxChecks;
     private List<box_items_effect> list_items_tray = new();
     private List<box_items> listBox = new();
     private List<GameObject> listFindHelp = new();
-    private List<Sprite> list_sp_icon;
+    private List<Sprite> list_sp_icon = new();
 
     [Header("Msg Scores")]
     public Text txt_msg_scores;
     private float TimerSpeed = 1.2f;
     private float TimerHelp = 0f;
-    public bool IsPlay = true;
+    public bool IsPlay = false;
     private bool IsCheck = false;
 
-    public void on_load()
+    public void OnLoad()
     {
+        for (int i = 0; i < this.sp_item_box.Length; i++) this.list_sp_icon.Add(this.sp_item_box[i]);
+        this.PanelGameOver.SetActive(false);
+        this.PanelGamePause.SetActive(false);
+        this.IsPlay = false;
+    }
+
+    public void StartGame(int MaxBoxItem, int MaxBoxTray)
+    {
+        this.MaxBoxItem = MaxBoxItem;
+        this.MaxBoxTray = MaxBoxTray;
+        for (int i = 0; i < objBoxChecks.Length; i++)
+        {
+            if (i < MaxBoxTray) objBoxChecks[i].SetActive(true);
+            else objBoxChecks[i].SetActive(false);
+        }
+
+        for (int i = 0; i < this.sp_item_box.Length; i++) this.list_sp_icon.Add(this.sp_item_box[i]);
         this.PanelGameOver.SetActive(false);
         this.PanelGamePause.SetActive(false);
         this.CreateTable();
+        this.IsPlay = true;
+    }
+
+    private void HideCatAlert()
+    {
+        objCatTrue.SetActive(false);
+        objCatFail.SetActive(false);
+    }
+
+    private void ShowCatAlert(bool isTrue)
+    {
+        HideCatAlert();
+        if (isTrue)
+        {
+            objCatTrue.SetActive(true);
+            objCatTrue.GetComponent<Image>().sprite = GetSpRandom(spCatTrue);
+        }
+        else
+        {
+            objCatFail.SetActive(true);
+            objCatFail.GetComponent<Image>().sprite = GetSpRandom(spCatFail);
+        }
+    }
+
+    private Sprite GetSpRandom(Sprite[] sps)
+    {
+        int indexRand = UnityEngine.Random.Range(0, sps.Length);
+        return sps[indexRand];
     }
 
     private void CreateTable()
     {
-        this.IsPlay = true;
+        HideCatAlert();
         this.sliderTimer.value = 1;
         this.objBtnClear.SetActive(false);
-        this.list_sp_icon = new List<Sprite>();
-
-        for (int i = 0; i < this.sp_item_box.Length; i++) this.list_sp_icon.Add(this.sp_item_box[i]);
 
         this.ClearTray();
         this.GetComponent<Games>().carrot.clear_contain(this.area_body_all_item);
@@ -80,6 +130,7 @@ public class Box_Manager : MonoBehaviour
             boxItem.set_color_bk(Color.white);
             boxItem.SetActClick(() =>
             {
+                HideCatAlert();
                 this.ClearListHelp();
                 game.CreateEffect(boxItem.transform.position, 2, 0.2f, 0.5f);
                 game.carrot.play_sound_click();
@@ -98,6 +149,10 @@ public class Box_Manager : MonoBehaviour
                     boxEffect.img_border.color = color_bk_box[b.type_color];
                     this.SetBoxToTray(boxEffect, indexTrTaget);
                 }
+                else
+                {
+                    game.play_sound(3);
+                }
             });
             listBox.Add(boxItem);
         }
@@ -111,8 +166,8 @@ public class Box_Manager : MonoBehaviour
         return boxes
             .Where(b => b.status == BoxStatusType.open)
             .GroupBy(b => new { b.type, b.type_color })
-            .FirstOrDefault(g => g.Count() >= 3)?
-            .Take(3)
+            .FirstOrDefault(g => g.Count() >= MaxBoxTray)?
+            .Take(MaxBoxTray)
             .ToList();
     }
 
@@ -140,7 +195,7 @@ public class Box_Manager : MonoBehaviour
     private int CountTrayNotNull()
     {
         int count = 0;
-        for (int i = 0; i < this.tr_check.Length; i++)
+        for (int i = 0; i <MaxBoxTray; i++)
         {
             if (list_items_tray[i] != null) count++;
         }
@@ -156,7 +211,7 @@ public class Box_Manager : MonoBehaviour
 
     public void CheckTray()
     {
-        if (this.CountTrayNotNull() >= 3 && this.IsCheck == false)
+        if (this.CountTrayNotNull() >= MaxBoxTray && this.IsCheck == false)
         {
             this.objBtnClear.SetActive(false);
             this.IsCheck = true;
@@ -174,16 +229,17 @@ public class Box_Manager : MonoBehaviour
         {
             if (type_box != this.list_items_tray[i].boxItem.type || type_color_box != this.list_items_tray[i].boxItem.type_color) is_true = false;
         }
-
+        
         if (is_true)
         {
             TimerHelp = 0f;
+            ShowCatAlert(true);
             List<box_items> listBoxGet = new();
             Debug.Log("Is True");
             for (int i = 0; i < this.list_items_tray.Count; i++)
             {
                 listBoxGet.Add(this.list_items_tray[i].boxItem);
-                this.game.CreateEffect(this.list_items_tray[i].transform.position, UnityEngine.Random.Range(0, 1), 0.3f);
+                this.game.CreateEffect(this.list_items_tray[i].transform.position, 1, 0.3f);
                 Destroy(this.list_items_tray[i].gameObject);
             }
 
@@ -199,7 +255,11 @@ public class Box_Manager : MonoBehaviour
                 int index_rand = UnityEngine.Random.Range(0, this.list_sp_icon.Count);
                 listBoxGet[i].set_data(this.list_sp_icon[index_rand], index_rand);
                 listBoxGet[i].ReOpen();
-                if (indexSelLevelUp != i) listBoxGet[i].type_color = 0;
+                if (indexSelLevelUp != i)
+                {
+                    listBoxGet[i].type_color = 0;
+                    listBoxGet[i].set_color_bk(this.color_bk_box[0]);
+                }
             }
 
             GameObject objBoxEffect = Instantiate(this.BoxItemEffectPrefab);
@@ -213,12 +273,15 @@ public class Box_Manager : MonoBehaviour
             boxEffect.OnLoad(b.gameObject.transform, b, boxEffect_status_type.create);
             boxEffect.img_border.color = color_bk_box[b.type_color];
             b.CloseBox();
+            this.game.CreateEffect(this.list_items_tray[1].transform.position, 5, 0.4f, 2f);
 
             this.txt_msg_scores.text = "x" + scores_add;
             this.game.anim.Play("game_add_scores");
+            game.carrot.delay_function(2f, HideCatAlert);
         }
         else
         {
+            ShowCatAlert(false);
             for (int i = 0; i < this.list_items_tray.Count; i++)
             {
                 this.list_items_tray[i].give_up();
@@ -226,11 +289,10 @@ public class Box_Manager : MonoBehaviour
             Debug.Log("Is false");
             this.sliderTimer.value -= 0.2f;
             this.game.play_sound(1);
+            game.carrot.delay_function(2f, HideCatAlert);
         }
-        this.list_items_tray = new List<box_items_effect>(3);
-        this.list_items_tray.Add(null);
-        this.list_items_tray.Add(null);
-        this.list_items_tray.Add(null);
+        this.list_items_tray = new List<box_items_effect>();
+        for(int i=0;i<MaxBoxTray;i++) this.list_items_tray.Add(null);
         this.IsCheck = false;
     }
 
@@ -267,6 +329,7 @@ public class Box_Manager : MonoBehaviour
 
             if (this.sliderTimer.value <= 0)
             {
+                HideCatAlert();
                 this.game.play_sound(2);
                 this.game.carrot.play_vibrate();
                 this.sliderTimer.value = 0;
@@ -287,7 +350,6 @@ public class Box_Manager : MonoBehaviour
                 this.TimerHelp += 0.1f;
                 if (this.TimerHelp > 30f)
                 {
-                    Debug.Log("Tim help");
                     List<box_items> listbox = this.FindFirstTriple(this.listBox);
                     if (listbox.Count >= 0)
                     {
@@ -303,6 +365,7 @@ public class Box_Manager : MonoBehaviour
                             }
                         }
                     }
+                    Debug.Log("Tim help:"+listbox.Count);
                     this.TimerHelp = 0;
                 }
             }
@@ -349,9 +412,7 @@ public class Box_Manager : MonoBehaviour
             }
         }
         list_items_tray = new();
-        list_items_tray.Add(null);
-        list_items_tray.Add(null);
-        list_items_tray.Add(null);
+        for(int i=0;i<MaxBoxTray;i++) this.list_items_tray.Add(null);
         objBtnClear.SetActive(false);
     }
 }

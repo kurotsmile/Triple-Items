@@ -1,12 +1,18 @@
+using Carrot;
 using UnityEngine;
 
 public class Games : MonoBehaviour
 {
+    [Header("Object Main")]
     public Carrot.Carrot carrot;
     public Box_Manager boxs;
     public History history;
     public GameObject[] effect_prefab;
     public IronSourceAds ads;
+
+    [Header("Object Ui")]
+    public GameObject panelHome;
+    public GameObject panelPlay;
 
     [Header("Sounds")]
     public AudioSource soundBk;
@@ -24,13 +30,20 @@ public class Games : MonoBehaviour
     {
         this.carrot.Load_Carrot(this.check_exit_app);
         this.carrot.game.load_bk_music(this.soundBk);
-        this.boxs.on_load();
+        boxs.OnLoad();
         this.history.OnLoad();
+        this.panelHome.SetActive(true);
+        this.panelPlay.SetActive(false);
     }
 
     private void check_exit_app()
     {
-        if (boxs.PanelGameOver.activeInHierarchy)
+        if (panelPlay.activeInHierarchy)
+        {
+            BtnOnBackHome();
+            carrot.set_no_check_exit_app();
+        }
+        else if (boxs.PanelGameOver.activeInHierarchy)
         {
             boxs.BtnPlayAgain();
             carrot.set_no_check_exit_app();
@@ -45,10 +58,15 @@ public class Games : MonoBehaviour
     public void btn_setting()
     {
         this.ads.show_ads_Interstitial();
-        this.carrot.Create_Setting();
+        Carrot_Box boxSetting = this.carrot.Create_Setting();
+        Carrot_Box_Item itemHistory = boxSetting.create_item_of_top();
+        itemHistory.set_icon(spIconHistory);
+        itemHistory.set_title("Play History");
+        itemHistory.set_tip("Your play history and scores");
+        itemHistory.set_act(BtnHistory);
     }
 
-    public void CreateEffect(Vector3 pos, int index = 0, float scale = 1f,float timerDestroy=1f)
+    public void CreateEffect(Vector3 pos, int index = 0, float scale = 1f, float timerDestroy = 1f)
     {
         GameObject obj_effect = Instantiate(this.effect_prefab[index]);
         obj_effect.transform.SetParent(this.transform.root);
@@ -67,5 +85,38 @@ public class Games : MonoBehaviour
         this.ads.show_ads_Interstitial();
         this.carrot.play_sound_click();
         this.history.ShowList();
+    }
+
+    public void BtnSelModePlay(int indexMode)
+    {
+        this.carrot.play_sound_click();
+        this.panelHome.SetActive(false);
+        this.panelPlay.SetActive(true);
+        if (indexMode == 0) boxs.StartGame(30, 2);
+        if (indexMode == 1) boxs.StartGame(60, 3);
+        if (indexMode == 2) boxs.StartGame(68, 4);
+    }
+
+    public void BtnOnBackHome()
+    {
+        this.panelHome.SetActive(true);
+        this.panelPlay.SetActive(false);
+        this.carrot.play_sound_click();
+        boxs.IsPlay = false;
+    }
+
+    public void BtnShare()
+    {
+        this.carrot.show_share();
+    }
+
+    public void BtnOtherGame()
+    {
+        carrot.show_list_carrot_app();
+    }
+
+    public void BtnRate()
+    {
+        carrot.show_rate();
     }
 }
