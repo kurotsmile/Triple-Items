@@ -1,5 +1,6 @@
 using Carrot;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Games : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class Games : MonoBehaviour
     public History history;
     public GameObject[] effect_prefab;
     public IronSourceAds ads;
+    public Carrot_DeviceOrientationChange r;
 
     [Header("Object Ui")]
     public GameObject panelHome;
@@ -39,6 +41,8 @@ public class Games : MonoBehaviour
         this.carrot.act_buy_ads_success = this.ads.RemoveAds;
         this.carrot.game.act_click_watch_ads_in_music_bk = this.ads.ShowRewardedVideo;
         this.ads.onRewardedSuccess = this.carrot.game.OnRewardedSuccess;
+
+        carrot.delay_function(2f, this.CheckRotateScene);
     }
 
     private void check_exit_app()
@@ -58,6 +62,17 @@ public class Games : MonoBehaviour
             boxs.BtnContinue();
             carrot.set_no_check_exit_app();
         }
+    }
+
+    public void CheckRotateScene()
+    {
+        carrot.delay_function(1.2f, () =>
+        {
+            if (this.r.Get_status_portrait())
+                boxs.area_body_all_item.GetComponent<GridLayoutGroup>().constraintCount = 5;
+            else
+                boxs.area_body_all_item.GetComponent<GridLayoutGroup>().constraintCount = 6;
+        });
     }
 
     public void btn_setting()
@@ -94,6 +109,7 @@ public class Games : MonoBehaviour
 
     public void BtnSelModePlay(int indexMode)
     {
+        this.ads.show_ads_Interstitial();
         this.carrot.play_sound_click();
         this.panelHome.SetActive(false);
         this.panelPlay.SetActive(true);
@@ -118,6 +134,7 @@ public class Games : MonoBehaviour
 
     public void BtnOnBackHome()
     {
+        this.ads.show_ads_Interstitial();
         this.panelHome.SetActive(true);
         this.panelPlay.SetActive(false);
         this.carrot.play_sound_click();
